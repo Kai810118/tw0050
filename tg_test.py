@@ -74,29 +74,24 @@ try:
             prev_ema5 = round(prev['ema5'], 2)
             prev_ema20 = round(prev['ema20'], 2)
             if ema5 > ema20:
-                trend = '\u91d1\u53c9(\u591a\u982d)'
+                trend = 'Golden Cross (Bull)'
             elif ema5 < ema20:
-                trend = '\u6b7b\u53c9(\u7a7a\u982d)'
+                trend = 'Death Cross (Bear)'
             else:
-                trend = '\u7e5d\u7d50'
+                trend = 'Neutral'
         else:
             ema5 = ema10 = ema20 = ema60 = rsi = prev_ema5 = prev_ema20 = 0
-            trend = '\u7121\u6cd5\u8a08\u7b97'
+            trend = 'N/A'
 
         signal = 'none'
-        reason = ''
         if prev_ema5 <= prev_ema20 and ema5 > ema20:
             signal = 'buy'
-            reason = 'EMA5\u7a7f\u904eEMA20\u91d1\u53c9'
         elif prev_ema5 >= prev_ema20 and ema5 < ema20:
             signal = 'sell'
-            reason = 'EMA5\u8dcc\u7834EMA20\u6b7b\u53c9'
         elif rsi < 30 and state['position'] == 'none':
             signal = 'buy'
-            reason = 'RSI\u8d85\u8ce4\u5340'
         elif rsi > 75 and state['position'] == 'long':
             signal = 'sell'
-            reason = 'RSI\u8d85\u8cb8\u5340'
 
         pnl = 0
         pnl_pct = 0
@@ -104,64 +99,36 @@ try:
             pnl = round((price - state['entry']) * state['size'], 2)
             pnl_pct = round((price - state['entry']) / state['entry'] * 100, 2)
 
-        psych = []
-        if rsi < 30:
-            psych.append('\u6050\u614c\u5340-\u9滴92f\u5206\u6279\u9032\u5834')
-        elif rsi > 70:
-            psych.append('\u8ca8\u8ccc\u5340-\u8003\u616e\u6e1b\u5009')
-        elif 40 <= rsi <= 60:
-            psych.append('\u5e02\u5834\u4e2d\u6027-\u6b63\u5e38\u6301\u6709')
-        if pct > 2:
-            psych.append('\u4eca\u65e5\u6f32\u5e45\u8f03\u5927-\u6ce8\u610f\u8ffd\u9ad8\u98a8\u96aa')
-        elif pct < -2:
-            psych.append('\u4eca\u65e5\u8dcc\u5e45\u8f03\u5927-\u52ff\u6050\u614c\u629b\u552e')
-        if rt['volume'] > 100000:
-            psych.append('\u6210\u4ea4\u91cf\u653e\u5927-\u5e02\u5834\u95dc\u6ce8\u5ea6\u9ad8')
-        elif rt['volume'] < 30000:
-            psych.append('\u6210\u4ea4\u91cf\u504f\u4f4e-\u6d41\u52d5\u6027\u8f03\u5dee')
-
-        report = '\u3010 00878 \u76d1\u63a7\u5831\u544a \u3011\n'
-        report += now_str + ' \u53f0\u5317\u6642\u9593\n'
-        report += '========================\n\n'
-        report += '\u3010\u5373\u6642\u5831\u50f9\u3011\n'
-        report += '\u73fe\u50f9: $' + str(round(price, 2)) + '\n'
-        report += '\u6f32\u8dcc: $' + str(round(change, 2)) + ' (' + str(round(pct, 2)) + '%)\n'
-        report += '\u958b\u76e4: $' + str(round(rt['open'], 2)) + '\n'
-        report += '\u6700\u9ad8: $' + str(round(rt['high'], 2)) + '\n'
-        report += '\u6700\u4f4e: $' + str(round(rt['low'], 2)) + '\n'
-        report += '\u6210\u4ea4\u91cf: ' + str(rt['volume']) + '\n\n'
-        report += '\u3010\u6280\u8853\u6307\u6a19\u3011\n'
+        report = '00878 Report\n'
+        report += now_str + ' Taipei\n'
+        report += '==================\n'
+        report += 'Price: $' + str(round(price, 2)) + '\n'
+        report += 'Change: $' + str(round(change, 2)) + ' (' + str(round(pct, 2)) + '%)\n'
+        report += 'Open: $' + str(round(rt['open'], 2)) + '\n'
+        report += 'High: $' + str(round(rt['high'], 2)) + '\n'
+        report += 'Low: $' + str(round(rt['low'], 2)) + '\n'
+        report += 'Volume: ' + str(rt['volume']) + '\n\n'
         report += 'EMA5: ' + str(ema5) + '\n'
         report += 'EMA10: ' + str(ema10) + '\n'
         report += 'EMA20: ' + str(ema20) + '\n'
         report += 'EMA60: ' + str(ema60) + '\n'
         report += 'RSI: ' + str(rsi) + '\n'
-        report += '\u5747\u7dda\u72b6\u614b: ' + trend + '\n\n'
-        report += '\u3010\u6301\u4ed3\u72b6\u6cc1\u3011\n'
+        report += 'Trend: ' + trend + '\n\n'
         if state['position'] == 'long':
-            report += '\u6301\u6709: ' + str(state['size']) + '\u80a1\n'
-            report += '\u6210\u672c: $' + str(state['entry']) + '\n'
-            report += '\u5e38\u9762\u76c8\u4e8f: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n'
-            days = (now - datetime.strptime(state['date'], '%Y-%m-%d')).days if state['date'] else 0
-            report += '\u6301\u6709\u5929\u6578: ' + str(days) + '\u5929\n'
+            report += 'Position: ' + str(state['size']) + ' shares\n'
+            report += 'Entry: $' + str(state['entry']) + '\n'
+            report += 'PnL: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n\n'
         else:
-            report += '\u7a7a\u5009-\u7b49\u5f85\u8cb2\u5165\u573a\n'
-        report += '\n\u3010\u5e02\u5834\u5fc3\u7406\u5206\u6790\u3011\n'
-        for p in psych:
-            report += '\u2022 ' + p + '\n'
-        report += '\n\u3010\u7b56\u7565\u5efa\u8b70\u3011\n'
+            report += 'Position: Empty\n\n'
         if signal == 'buy':
-            report += '\u2705 \u8cb2\u5165\u8a0a\u865f \u2705\n'
-            report += '\u5efa\u8b70\u8cb2\u5165 00878\n'
-            report += '\u6311\u55ae\u50f9: $' + str(round(price, 2)) + '\n'
-            report += '\u6578\u91cf: 12\u80a1 (\u7d04$400)\n'
-            report += '\u4e0b\u55ae\u65b9\u5f0f: \u7389\u5c71App \u96f6\u80a1\u8cb2\u5165\n'
+            report += '>>> BUY <<<\n'
+            report += 'Buy 00878 at $' + str(round(price, 2)) + '\n'
+            report += '12 shares (~$400)\n'
         elif signal == 'sell':
-            report += '\u26a0\ufe0f \u8ce4\u51fa\u8a0a\u865f \u26a0\ufe0f\n'
-            report += '\u5efa\u8b70\u8ce4\u51fa 00878\n'
-            report += '\u6311\u55ae\u50f9: $' + str(round(price, 2)) + '\n'
+            report += '>>> SELL <<<\n'
+            report += 'Sell 00878 at $' + str(round(price, 2)) + '\n'
         else:
-            report += '\u7b49\u5f85\u8a0a\u865f\n'
+            report += 'Action: Wait\n'
 
         send(report)
 
