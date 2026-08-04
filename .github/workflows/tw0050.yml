@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install requests
-      - run: python -c "import requests,os; b=os.environ['TG_BOT_TOKEN']; u=os.environ['TG_USER_ID']; r=requests.post('https://api.telegram.org/bot'+b+'/sendMessage',json={'chat_id':u,'text':'00878 test from GitHub Actions'}); print(r.status_code, r.json())"
+      - run: python -c "import os,requests; b=os.environ['TG_BOT_TOKEN']; u=os.environ['TG_USER_ID']; r=requests.post('https://api.telegram.org/bot'+b+'/sendMessage',json={'chat_id':u,'text':'00878 策略測試\n現價: 32.57 元\n漲跌: +0.25 元 (+0.77%)\nRSI: 58.2\n均線: 金叉多頭\n持倉: 空倉\n策略: 等待買入訊號\n心理: 市場中性\n\n測試推播成功'}); print(r.status_code)}"
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_USER_ID: ${{ secrets.TG_USER_ID }}
