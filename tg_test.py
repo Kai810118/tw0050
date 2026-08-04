@@ -79,14 +79,14 @@ try:
             prev_ema5 = round(prev['ema5'], 2)
             prev_ema20 = round(prev['ema20'], 2)
             if ema5 > ema20:
-                trend = 'Golden Cross (Bull)'
+                trend = '\u91d1\u53c9(\u591a\u982d)'
             elif ema5 < ema20:
-                trend = 'Death Cross (Bear)'
+                trend = '\u6b7b\u53c9(\u7a7a\u982d)'
             else:
-                trend = 'Neutral'
+                trend = '\u7e5d\u7d50'
         else:
             ema5 = ema10 = ema20 = ema60 = rsi = prev_ema5 = prev_ema20 = 0
-            trend = 'N/A'
+            trend = '\u7121\u6cd5\u8a08\u7b97'
 
         signal = 'none'
         if prev_ema5 <= prev_ema20 and ema5 > ema20:
@@ -108,58 +108,65 @@ try:
             pnl_pct = round((price - state['entry']) / state['entry'] * 100, 2)
             net_pnl = round(pnl - fee, 2)
 
-        report = '00878 Report\n'
-        report += now_str + ' Taipei\n'
-        report += '==================\n'
-        report += 'Price: $' + str(round(price, 2)) + '\n'
-        report += 'Change: $' + str(round(change, 2)) + ' (' + str(round(pct, 2)) + '%)\n'
-        report += 'Open: $' + str(round(rt['open'], 2)) + '\n'
-        report += 'High: $' + str(round(rt['high'], 2)) + '\n'
-        report += 'Low: $' + str(round(rt['low'], 2)) + '\n'
-        report += 'Volume: ' + str(rt['volume']) + '\n\n'
+        report = '\u3010 00878 \u76d1\u63a7\u5831\u544a \u3011\n'
+        report += now_str + ' \u53f0\u5317\u6642\u9593\n'
+        report += '========================\n\n'
+        report += '\u3010\u5373\u6642\u5831\u50f9\u3011\n'
+        report += '\u73fe\u50f9: $' + str(round(price, 2)) + '\n'
+        report += '\u6f32\u8dcc: $' + str(round(change, 2)) + ' (' + str(round(pct, 2)) + '%)\n'
+        report += '\u958b\u76e4: $' + str(round(rt['open'], 2)) + '\n'
+        report += '\u6700\u9ad8: $' + str(round(rt['high'], 2)) + '\n'
+        report += '\u6700\u4f4e: $' + str(round(rt['low'], 2)) + '\n'
+        report += '\u6210\u4ea4\u91cf: ' + str(rt['volume']) + '\n\n'
+        report += '\u3010\u6280\u8853\u6307\u6a19\u3011\n'
         report += 'EMA5: ' + str(ema5) + '\n'
         report += 'EMA10: ' + str(ema10) + '\n'
         report += 'EMA20: ' + str(ema20) + '\n'
         report += 'EMA60: ' + str(ema60) + '\n'
         report += 'RSI: ' + str(rsi) + '\n'
-        report += 'Trend: ' + trend + '\n\n'
+        report += '\u5747\u7dda\u72b6\u614b: ' + trend + '\n\n'
+        report += '\u3010\u6301\u4ed3\u72b6\u6cc1\u3011\n'
         if state['position'] == 'long':
-            report += 'Position: ' + str(state['size']) + ' shares\n'
-            report += 'Entry: $' + str(state['entry']) + '\n'
-            report += 'Gross PnL: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n'
-            report += 'Fees: $' + str(fee) + '\n'
-            report += 'Net PnL: $' + str(net_pnl) + '\n\n'
+            report += '\u6301\u6709: ' + str(state['size']) + '\u80a1\n'
+            report += '\u8cb2\u5165\u6210\u672c: $' + str(state['entry']) + '\n'
+            report += '\u6bdb\u5229: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n'
+            report += '\u624b\u7e8c\u8cbb: $' + str(fee) + '\n'
+            report += '\u6de8\u5229: $' + str(net_pnl) + '\n\n'
         else:
-            report += 'Position: Empty\n\n'
-
-        buy_fee_per_share = round(price * TOTAL_FEE, 2)
-        report += 'Fees per share: $' + str(buy_fee_per_share) + ' (0.385%)\n'
-        report += 'Min profit per share: $' + str(round(price * 0.00385, 2)) + '\n\n'
-
+            report += '\u7a7a\u5009 - \u7b49\u5f85\u8cb2\u5165\u573a\n\n'
+        report += '\u3010\u4ea4\u6613\u6210\u672c\u3011\n'
+        report += '\u4e70\u5165\u624b\u7e8c\u8cbb: 0.1425%\n'
+        report += '\u8ce4\u51fa\u624b\u7e8c\u8cbb: 0.1425%\n'
+        report += '\u8b49\u4ea4\u7a05: 0.1%\n'
+        report += '\u4f86\u56de\u7e3d\u6210\u672c: 0.385%\n'
+        report += '\u6bcf\u80a1\u6700\u4f4e\u76c8\u92b7: $' + str(round(price * TOTAL_FEE, 2)) + '\n\n'
+        report += '\u3010\u7b56\u7565\u5efa\u8b70\u3011\n'
         if signal == 'buy':
-            report += '>>> BUY <<<\n'
-            report += 'Buy 00878 at $' + str(round(price, 2)) + '\n'
-            report += '12 shares (~$400)\n'
-            report += 'Total fee: $' + str(round(price * 12 * TOTAL_FEE, 2)) + '\n'
-            report += 'Min profit needed: ' + str(round(TOTAL_FEE * 100, 2)) + '%\n'
+            report += '\u2705 \u8cb2\u5165\u8a0a\u865f \u2705\n'
+            report += '\u5efa\u8b70\u8cb2\u5165 00878\n'
+            report += '\u6311\u55ae\u50f9: $' + str(round(price, 2)) + '\n'
+            report += '\u6578\u91cf: 12\u80a1 (\u7d04$400)\n'
+            report += '\u7e3d\u624b\u7e8c\u8cbb: $' + str(round(price * 12 * TOTAL_FEE, 2)) + '\n'
+            report += '\u4e0b\u55ae\u65b9\u5f0f: \u7389\u5c71App \u96f6\u80a1\u8cb2\u5165\n'
         elif signal == 'sell':
             if state['position'] == 'long' and state['entry'] > 0:
                 gross_pct = round((price - state['entry']) / state['entry'] * 100, 2)
                 net_pct = round(gross_pct - TOTAL_FEE * 100, 2)
-                report += '>>> SELL <<<\n'
-                report += 'Sell 00878 at $' + str(round(price, 2)) + '\n'
-                report += 'Gross profit: ' + str(gross_pct) + '%\n'
-                report += 'Total fee: ' + str(round(TOTAL_FEE * 100, 2)) + '%\n'
-                report += 'Net profit: ' + str(net_pct) + '%\n'
+                report += '\u26a0\ufe0f \u8ce4\u51fa\u8a0a\u865f \u26a0\ufe0f\n'
+                report += '\u5efa\u8b70\u8ce4\u51fa 00878\n'
+                report += '\u6311\u55ae\u50f9: $' + str(round(price, 2)) + '\n'
+                report += '\u6bdb\u5229: ' + str(gross_pct) + '%\n'
+                report += '\u624b\u7e8c\u8cbb: ' + str(round(TOTAL_FEE * 100, 2)) + '%\n'
+                report += '\u6de8\u5229: ' + str(net_pct) + '%\n'
                 if net_pct > 0:
-                    report += 'NET GAIN: $' + str(net_pnl) + '\n'
+                    report += '\u6de8\u8d5a: $' + str(net_pnl) + '\n'
                 else:
-                    report += 'NET LOSS: $' + str(net_pnl) + '\n'
+                    report += '\u6de8\u8b17: $' + str(net_pnl) + '\n'
             else:
-                report += '>>> SELL <<<\n'
-                report += 'Sell 00878 at $' + str(round(price, 2)) + '\n'
+                report += '\u26a0\ufe0f \u8ce4\u51fa\u8a0a\u865f \u26a0\ufe0f\n'
+                report += '\u5efa\u8b70\u8ce4\u51fa 00878\n'
         else:
-            report += 'Action: Wait\n'
+            report += '\u7b49\u5f85\u8a0a\u865f\n'
 
         send(report)
 
