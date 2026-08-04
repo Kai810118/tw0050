@@ -5,6 +5,11 @@ BOT = os.environ.get('TG_BOT_TOKEN', '')
 UID = os.environ.get('TG_USER_ID', '')
 STATE_FILE = '.tw00878_state.json'
 
+BUY_FEE = 0.001425
+SELL_FEE = 0.001425
+TAX = 0.001
+TOTAL_FEE = BUY_FEE + SELL_FEE + TAX
+
 def send(msg):
     requests.post('https://api.telegram.org/bot' + BOT + '/sendMessage', json={'chat_id': UID, 'text': msg})
 
@@ -95,9 +100,13 @@ try:
 
         pnl = 0
         pnl_pct = 0
+        fee = 0
+        net_pnl = 0
         if state['position'] == 'long' and state['entry'] > 0:
+            fee = round(state['entry'] * state['size'] * TOTAL_FEE, 2)
             pnl = round((price - state['entry']) * state['size'], 2)
             pnl_pct = round((price - state['entry']) / state['entry'] * 100, 2)
+            net_pnl = round(pnl - fee, 2)
 
         report = '00878 Report\n'
         report += now_str + ' Taipei\n'
@@ -117,16 +126,38 @@ try:
         if state['position'] == 'long':
             report += 'Position: ' + str(state['size']) + ' shares\n'
             report += 'Entry: $' + str(state['entry']) + '\n'
-            report += 'PnL: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n\n'
+            report += 'Gross PnL: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n'
+            report += 'Fees: $' + str(fee) + '\n'
+            report += 'Net PnL: $' + str(net_pnl) + '\n\n'
         else:
             report += 'Position: Empty\n\n'
+
+        buy_fee_per_share = round(price * TOTAL_FEE, 2)
+        report += 'Fees per share: $' + str(buy_fee_per_share) + ' (0.385%)\n'
+        report += 'Min profit per share: $' + str(round(price * 0.00385, 2)) + '\n\n'
+
         if signal == 'buy':
             report += '>>> BUY <<<\n'
             report += 'Buy 00878 at $' + str(round(price, 2)) + '\n'
             report += '12 shares (~$400)\n'
+            report += 'Total fee: $' + str(round(price * 12 * TOTAL_FEE, 2)) + '\n'
+            report += 'Min profit needed: ' + str(round(TOTAL_FEE * 100, 2)) + '%\n'
         elif signal == 'sell':
-            report += '>>> SELL <<<\n'
-            report += 'Sell 00878 at $' + str(round(price, 2)) + '\n'
+            if state['position'] == 'long' and state['entry'] > 0:
+                gross_pct = round((price - state['entry']) / state['entry'] * 100, 2)
+                net_pct = round(gross_pct - TOTAL_FEE * 100, 2)
+                report += '>>> SELL <<<\n'
+                report += 'Sell 00878 at $' + str(round(price, 2)) + '\n'
+                report += 'Gross profit: ' + str(gross_pct) + '%\n'
+                report += 'Total fee: ' + str(round(TOTAL_FEE * 100, 2)) + '%\n'
+                report += 'Net profit: ' + str(net_pct) + '%\n'
+                if net_pct > 0:
+                    report += 'NET GAIN: $' + str(net_pnl) + '\n'
+                else:
+                    report += 'NET LOSS: $' + str(net_pnl) + '\n'
+            else:
+                report += '>>> SELL <<<\n'
+                report += 'Sell 00878 at $' + str(round(price, 2)) + '\n'
         else:
             report += 'Action: Wait\n'
 
