@@ -14,7 +14,7 @@ jobs:
         with:
           python-version: '3.11'
       - run: pip install yfinance pandas ta
-      - run: python tw0050_strategy.py
+      - run: python tw00878_strategy.py
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_USER_ID: ${{ secrets.TG_USER_ID }}
