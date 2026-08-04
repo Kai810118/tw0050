@@ -1,8 +1,6 @@
 name: 00878 Strategy Monitor
 
 on:
-  schedule:
-    - cron: '*/5 1-5 * * 1-5'
   workflow_dispatch:
 
 jobs:
@@ -13,8 +11,19 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - run: pip install yfinance pandas
-      - run: python tw00878_strategy.py
+      - run: pip install yfinance pandas requests
+      - run: |
+          python -c "
+import os, json, requests
+bot = os.environ.get('TG_BOT_TOKEN', '')
+uid = os.environ.get('TG_USER_ID', '')
+print(f'Bot: {bot[:5]}...')
+print(f'UID: {uid}')
+r = requests.get('https://api.telegram.org/bot' + bot + '/getMe')
+print(f'TG test: {r.status_code} {r.json().get(\"ok\", \"\")}')
+r2 = requests.post('https://api.telegram.org/bot' + bot + '/sendMessage', json={'chat_id': uid, 'text': '00878 策略測試\n現價: 32.57 元\n漲跌: 正 0.25 元\nRSI: 58.2\n均線: 金叉\n持倉: 空倉\n策略: 等待買入\n\n測試推播成功 ✅'})
+print(f'Send: {r2.status_code} {r2.json().get(\"ok\", \"\")}')
+"
         env:
           TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
           TG_USER_ID: ${{ secrets.TG_USER_ID }}
