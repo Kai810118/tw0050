@@ -1,0 +1,20 @@
+name: 0050 Strategy Monitor
+
+on:
+  schedule:
+    - cron: '*/10 1-5 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  run-strategy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install yfinance pandas ta
+      - run: python tw0050_strategy.py
+        env:
+          TG_BOT_TOKEN: ${{ secrets.TG_BOT_TOKEN }}
+          TG_USER_ID: ${{ secrets.TG_USER_ID }}
