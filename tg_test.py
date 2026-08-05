@@ -54,15 +54,20 @@ def get_history():
         Taipei = timezone(timedelta(hours=8))
         now = datetime.now(Taipei)
         closes = []
+        hdr = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
         
-        for m in range(3):
+        for m in range(6):
             d = now - timedelta(days=30*m)
-            url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=' + d.strftime('%Y%m01') + '&stockNo=00878'
-            r = requests.get(url, timeout=15)
-            data = r.json()
-            if 'data' in data:
-                for row in data['data']:
-                    closes.append(float(row[6].replace(',', '')))
+            date_str = d.strftime('%Y%m01')
+            url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=' + date_str + '&stockNo=00878'
+            try:
+                r = requests.get(url, headers=hdr, timeout=20)
+                data = r.json()
+                if 'data' in data:
+                    for row in data['data']:
+                        closes.append(float(row[6].replace(',', '')))
+            except Exception:
+                continue
         
         if len(closes) < 20:
             return None
