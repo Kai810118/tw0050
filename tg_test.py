@@ -51,28 +51,16 @@ def get_price():
 def get_history():
     try:
         import pandas as pd
-        Taipei = timezone(timedelta(hours=8))
-        now = datetime.now(Taipei)
-        closes = []
+        url = 'https://query1.finance.yahoo.com/v8/finance/chart/00878.TW?range=6mo&interval=1d'
         hdr = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        
-        for m in range(6):
-            d = now - timedelta(days=30*m)
-            date_str = d.strftime('%Y%m01')
-            url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=' + date_str + '&stockNo=00878'
-            try:
-                r = requests.get(url, headers=hdr, timeout=20)
-                data = r.json()
-                if 'data' in data:
-                    for row in data['data']:
-                        closes.append(float(row[6].replace(',', '')))
-            except Exception:
-                continue
+        r = requests.get(url, headers=hdr, timeout=20)
+        data = r.json()
+        closes = data['chart']['result'][0]['indicators']['quote'][0]['close']
+        closes = [c for c in closes if c is not None]
         
         if len(closes) < 20:
             return None
         
-        closes = closes[::-1]
         df = pd.DataFrame({'Close': closes})
         df['ema5'] = df['Close'].ewm(span=5).mean()
         df['ema10'] = df['Close'].ewm(span=10).mean()
