@@ -60,8 +60,8 @@ def get_history():
             url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=' + d.strftime('%Y%m01') + '&stockNo=00878'
             r = requests.get(url, timeout=15)
             data = r.json()
-            if 'data9' in data:
-                for row in data['data9']:
+            if 'data' in data:
+                for row in data['data']:
                     closes.append(float(row[6].replace(',', '')))
         
         if len(closes) < 20:
