@@ -107,9 +107,9 @@ try:
             trend = '\u7121\u6cd5\u8a08\u7b97'
 
         signal = 'none'
-        if prev_ema5 <= prev_ema20 and ema5 > ema20:
+        if prev_ema5 <= prev_ema20 and ema5 > ema20 and state['position'] == 'none':
             signal = 'buy'
-        elif prev_ema5 >= prev_ema20 and ema5 < ema20:
+        elif prev_ema5 >= prev_ema20 and ema5 < ema20 and state['position'] == 'long':
             signal = 'sell'
         elif rsi < 30 and state['position'] == 'none':
             signal = 'buy'
