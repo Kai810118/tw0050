@@ -28,8 +28,19 @@ def get_price():
     url = 'https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_00878.tw'
     r = requests.get(url, timeout=10)
     d = r.json()['msgArray'][0]
+    
+    price = None
+    if d['z'] != '-' and d['z']:
+        price = float(d['z'])
+    elif d['a'] and d['b']:
+        ask = float(d['a'].split('_')[0])
+        bid = float(d['b'].split('_')[0])
+        price = round((ask + bid) / 2, 2)
+    elif d['o'] and d['o'] != '-':
+        price = float(d['o'])
+    
     return {
-        'price': float(d['z']) if d['z'] != '-' else None,
+        'price': price,
         'open': float(d['o']) if d['o'] != '-' else 0,
         'high': float(d['h']) if d['h'] != '-' else 0,
         'low': float(d['l']) if d['l'] != '-' else 0,
@@ -61,7 +72,7 @@ try:
     price = rt['price']
 
     if price is None:
-        send('00878 no price now')
+        send('00878 no price')
     else:
         change = price - rt['yesterday']
         pct = change / rt['yesterday'] * 100 if rt['yesterday'] else 0
@@ -135,9 +146,6 @@ try:
         else:
             report += '\u7a7a\u5009 - \u7b49\u5f85\u8cb2\u5165\u573a\n\n'
         report += '\u3010\u4ea4\u6613\u6210\u672c\u3011\n'
-        report += '\u4e70\u5165\u624b\u7e8c\u8cbb: 0.1425%\n'
-        report += '\u8ce4\u51fa\u624b\u7e8c\u8cbb: 0.1425%\n'
-        report += '\u8b49\u4ea4\u7a05: 0.1%\n'
         report += '\u4f86\u56de\u7e3d\u6210\u672c: 0.385%\n'
         report += '\u6bcf\u80a1\u6700\u4f4e\u76c8\u92b7: $' + str(round(price * TOTAL_FEE, 2)) + '\n\n'
         report += '\u3010\u7b56\u7565\u5efa\u8b70\u3011\n'
