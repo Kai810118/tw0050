@@ -149,9 +149,27 @@ try:
             report += '\u8cb2\u5165\u6210\u672c: $' + str(state['entry']) + '\n'
             report += '\u6bdb\u5229: ' + str(pnl_pct) + '% ($' + str(pnl) + ')\n'
             report += '\u624b\u7e8c\u8cbb: $' + str(fee) + '\n'
-            report += '\u6de8\u5229: $' + str(net_pnl) + '\n\n'
+            report += '\u6de8\u5229: $' + str(net_pnl) + '\n'
         else:
-            report += '\u7a7a\u5009 - \u7b49\u5f85\u8cb2\u5165\u573a\n\n'
+            report += '\u7a7a\u5009 - \u7b49\u5f85\u8cb2\u5165\u573a\n'
+        psych = []
+        if state['position'] == 'long':
+            if net_pnl > 0:
+                psych.append('\ud83d\ude80 \u4f60\u73fe\u5728\u662f\u8cea\u8d0f\u7684\uff01\u522b\u5fd8\u8a18\u624b\u7e8c\u8cbb\u5df2\u62b5\u6d88\uff0c\u4e0d\u8981\u56e0\u70ba\u7a31\u52d5\u800c\u66f2\u4e86\u3002')
+            elif net_pnl > -state['entry'] * state['size'] * 0.01:
+                psych.append('\u2665 \u5c0d\u4e0d\u8d77\uff0c\u76ee\u524d\u662f\u5c0f\u8b17\u3002\u4f46 00878 \u662f ETF\uff0c\u6ce2\u52d5\u5c0f\uff0c\u4e0d\u7528\u64d4\u5fc3\u3002\u7b49\u8da8\u52e2\u7b56\u7565\u544a\u8a34\u4f60\u518d\u8b80\u3002')
+            else:
+                psych.append('\u26a0 \u8b17\u635f\u5df2\u7d93\u8f03\u5927\uff0c\u4e0b\u6b21\u8a0a\u865f\u51fa\u73fe\u6642\u8981\u56b4\u683c\u57f7\u884c\uff0c\u4e0d\u8981\u60f3\u8cf4\u8d0d\u3002')
+        else:
+            psych.append('\u4f60\u4e0d\u7528\u505a\u4efb\u4f55\u4e8b\uff0c\u7b49\u65b0\u865f\u5c31\u597d\u3002')
+        if pct < -2:
+            psych.append('\u4eca\u65e5\u8dcc\u5e45\u8f03\u5927\u3002\u554f\u5fc3\uff1a\u5403\u4e8f\u662f\u6295\u8cc7\u4e00\u90e8\u5206\uff0c\u52ff\u56e0\u6050\u614c\u800c\u4e3b\u52d5\u8ce4\u51fa\u3002')
+        elif pct > 2:
+            psych.append('\u4eca\u65e5\u6f32\u5e45\u8f03\u5927\u3002\u6bcf\u500d\u5396\u53d6\uff0c\u8ffd\u9ad8\u8acb\u6ce8\u610f\u3002')
+        report += '\n\u3010\u5fc3\u7406\u5b78\u5c0f\u5340\u3011\n'
+        for p in psych:
+            report += p + '\n'
+        report += '\n'
         report += '\u3010\u4ea4\u6613\u6210\u672c\u3011\n'
         report += '\u4f86\u56de\u7e3d\u6210\u672c: 0.385%\n'
         report += '\u6bcf\u80a1\u6700\u4f4e\u76c8\u92b7: $' + str(round(price * TOTAL_FEE, 2)) + '\n\n'
