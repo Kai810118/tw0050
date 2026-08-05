@@ -50,18 +50,32 @@ def get_price():
 
 def get_history():
     try:
-        import yfinance as yf
-        tk = yf.Ticker('00878.TW')
-        df = tk.history(period='3mo', interval='1d')
-        if df.empty:
+        import pandas as pd
+        Taipei = timezone(timedelta(hours=8))
+        now = datetime.now(Taipei)
+        closes = []
+        
+        for m in range(3):
+            d = now - timedelta(days=30*m)
+            url = 'https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date=' + d.strftime('%Y%m01') + '&stockNo=00878'
+            r = requests.get(url, timeout=15)
+            data = r.json()
+            if 'data9' in data:
+                for row in data['data9']:
+                    closes.append(float(row[6].replace(',', '')))
+        
+        if len(closes) < 20:
             return None
+        
+        closes = closes[::-1]
+        df = pd.DataFrame({'Close': closes})
         df['ema5'] = df['Close'].ewm(span=5).mean()
         df['ema10'] = df['Close'].ewm(span=10).mean()
         df['ema20'] = df['Close'].ewm(span=20).mean()
         df['ema60'] = df['Close'].ewm(span=60).mean()
         df['rsi'] = 100 - 100 / (1 + df['Close'].diff().clip(lower=0).rolling(14).mean() / df['Close'].diff().clip(upper=0).abs().rolling(14).mean())
         return df
-    except:
+    except Exception as e:
         return None
 
 try:
